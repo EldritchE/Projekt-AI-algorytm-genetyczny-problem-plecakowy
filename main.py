@@ -1,5 +1,8 @@
 import random
-import plotly.express as px
+import matplotlib.pyplot as plt
+import math
+from scipy import stats
+
     
 # Dane wejściowe
 wagaPrzedmiotu =    [12, 8, 15, 2, 9, 17, 36, 8, 14, 9]
@@ -9,7 +12,7 @@ pojemnoscPlecaka = 89
 # parametry_algorytmu
 rozmiarPopulacji = 20
 wspolczynnikMutacji = 0.1
-generacjeIlosc = 2
+generacjeIlosc = 4
 wspolczynnikKrzyzowania=0.8
 
 # initialize population
@@ -43,6 +46,7 @@ def mutate(jednostka, szansa=0.1):
             jednostka[i] = 1 - jednostka[i]
 
 # main genetic algorithm loop
+y=[]
 for generacja in range(generacjeIlosc):
     # evaluate fitness of current population
     wynikDopasowania = [OcenaDopasowan(jednostka) for jednostka in populacja]
@@ -80,7 +84,10 @@ for generacja in range(generacjeIlosc):
 
     # wybór najlepszego osobnika
     najlepszy_osobnik = max(populacja, key=OcenaDopasowan)
+
+
     najlepszeDopasowanie = OcenaDopasowan(najlepszy_osobnik)
+    y.append(najlepszeDopasowanie)
 # Wyniki
     print("Najlepszy Osobnik:", najlepszy_osobnik)
     print("Najlepsze Dopasowanie Wartości:", najlepszeDopasowanie)
@@ -92,6 +99,24 @@ for generacja in range(generacjeIlosc):
             najlepszaWaga= najlepszaWaga + wagaPrzedmiotu[x]
 
     print ("Przy Wadze:", najlepszaWaga)
+    plt.plot(generacja+1,najlepszeDopasowanie,'ro')
+    plt.ylabel("Najlepsze dopadsowanie wartości")
+    plt.xlabel("Kolejna generacja")
+    x = range(1,generacjeIlosc+1)
+    new_list = range(math.floor(min(x)), math.ceil(max(x)) + 1)
+    plt.xticks(new_list)
+    for x in range(len(populacja)):
+        if (OcenaDopasowan(populacja[x])==najlepszeDopasowanie):
+            plt.annotate("os"+str(x+1), (generacja+1, najlepszeDopasowanie))
+x = range(1, generacjeIlosc + 1)
+slope, intercept, r, p, std_err = stats.linregress(x, y)
 
-    # fig = px.scatter(x=[], y=[])
-    # fig.show()
+def myfunc(x):
+    return slope * x + intercept
+
+mymodel = list(map(myfunc, x))
+
+plt.scatter(x, y)
+plt.plot(x, mymodel)
+
+plt.show()
