@@ -2,6 +2,7 @@ import random
 import matplotlib.pyplot as plt
 import math
 from scipy import stats
+plt.close('all')
 
     
 # Dane wejściowe
@@ -12,7 +13,7 @@ pojemnoscPlecaka = 89
 # parametry_algorytmu
 rozmiarPopulacji = 20
 wspolczynnikMutacji = 0.1
-generacjeIlosc = 2
+generacjeIlosc = 4
 wspolczynnikKrzyzowania=0.8
 
 # initialize population
@@ -31,6 +32,7 @@ def OcenaDopasowan(jednostka):
 
 # select parents for crossover
 def Ruletka(population, k=3):
+
     konkurs = random.sample(population, k)
     return max(konkurs, key=OcenaDopasowan)
 
@@ -57,17 +59,19 @@ for generacja in range(generacjeIlosc):
     rodzice = [Ruletka(populacja) for _ in range(rozmiarPopulacji)]
     
 
-    
+    kary=0
     for x in range(len(populacja)):
         if(x < 9):
             print("osobnik #",x+1,"  ",populacja[x],"Wynik dopasowania tego osobnika : ",wynikDopasowania[x],end="")
             if wynikDopasowania[x]==0:
                 print(" Osobnik ",x+1,"jest przeładowany i ponosi karę",end="")
+                kary += 1
             print("")
         else:
             print("osobnik #",x+1," ",populacja[x],"Wynik dopasowania tego osobnika : ",wynikDopasowania[x],end="")
             if wynikDopasowania[x]==0:
                 print(" Osobnik ",x+1,"jest przeładowany i ponosi karę",end="")
+                kary += 1
             print("")
     print("\n")
     
@@ -75,15 +79,16 @@ for generacja in range(generacjeIlosc):
     nowaPopulacja = []
     odrzucone=0
     for i in range(rozmiarPopulacji // 2):
-        # TODO: random osoba z wykluczeniem siebie !!!
-        rodzic1, rodzic2 = rodzice[i * 2], rodzice[i * 2 + 1]
-        if random.uniform(0,1)<=wspolczynnikKrzyzowania:
+        rodzic1, rodzic2 = Ruletka(populacja), Ruletka(populacja)
+        while rodzic2 == rodzic1:
+            rodzic2 = Ruletka(populacja)
+        if random.uniform(0, 1) <= wspolczynnikKrzyzowania:
             dziecko1, dziecko2 = krzyzowanie(rodzic1, rodzic2)
+        # Przechodzą dalej czy mamy losować nową parę na ich miejsce???
         else:
             dziecko1 = rodzic1
             dziecko2 = rodzic2
-            odrzucone+=1
-        # print("w tej generacji liczba odrzuconych krzyżówek:", odrzucone)
+            odrzucone += 1
         mutate(dziecko1, wspolczynnikMutacji)
         mutate(dziecko2, wspolczynnikMutacji)
         nowaPopulacja.extend([dziecko1, dziecko2])
@@ -100,6 +105,7 @@ for generacja in range(generacjeIlosc):
 # Wyniki
     print("Najlepszy Osobnik:", najlepszy_osobnik)
     print("Najlepsze Dopasowanie Wartości:", najlepszeDopasowanie)
+
     najlepszaWaga = 0
 # print(najlepszy_osobnik)
 # print(wagaPrzedmiotu)
@@ -108,6 +114,9 @@ for generacja in range(generacjeIlosc):
             najlepszaWaga= najlepszaWaga + wagaPrzedmiotu[x]
 
     print ("Przy Wadze:", najlepszaWaga)
+    print("Ilość osobników w populacji ukaranych za przeładowanie: )", kary, "\n")
+    print("*"*70)
+
     plt.plot(generacja+1,najlepszeDopasowanie,'ro')
     plt.ylabel("Najlepsze dopadsowanie wartości")
     plt.xlabel("Kolejna generacja")
