@@ -11,9 +11,9 @@ wartoscPrzedmiotu = [25, 32, 5, 8, 16, 12, 19, 2, 14, 3]
 pojemnoscPlecaka = 89
 
 # parametry_algorytmu
-rozmiarPopulacji = 40
-wspolczynnikMutacji = 0.01
-generacjeIlosc = 20
+rozmiarPopulacji = 20
+wspolczynnikMutacji = 0.1
+generacjeIlosc = 2
 wspolczynnikKrzyzowania = 0.8
 
 
