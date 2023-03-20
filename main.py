@@ -1,7 +1,8 @@
 import random
-
+import plotly.express as px
+    
 # Dane wejściowe
-wagaPrzedmiotu = [12, 8, 15, 2, 9, 17, 36, 8, 14, 9]
+wagaPrzedmiotu =    [12, 8, 15, 2, 9, 17, 36, 8, 14, 9]
 wartoscPrzedmiotu = [25, 32, 5, 8, 16, 12, 19, 2, 14, 3]
 pojemnoscPlecaka = 89
 
@@ -9,7 +10,7 @@ pojemnoscPlecaka = 89
 rozmiarPopulacji = 20
 wspolczynnikMutacji = 0.1
 generacjeIlosc = 2
-wspolczynnikKrzyzowania=.8
+wspolczynnikKrzyzowania=0.8
 
 # initialize population
 def Generowanie_Indywidualne():
@@ -45,19 +46,26 @@ def mutate(jednostka, szansa=0.1):
 for generacja in range(generacjeIlosc):
     # evaluate fitness of current population
     wynikDopasowania = [OcenaDopasowan(jednostka) for jednostka in populacja]
-
     # select parents for crossover
     rodzice = [Ruletka(populacja) for _ in range(rozmiarPopulacji)]
+    
 
+    
+    for x in range(len(populacja)):
+        if(x < 9):
+            print("osobnik #",x+1,"  ",populacja[x])
+        else:
+            print("osobnik #",x+1," ",populacja[x])
+    print("\n")
+    
     # perform crossover and mutation to create new generation
     nowaPopulacja = []
     odrzucone=0
     for i in range(rozmiarPopulacji // 2):
-        # random osoba z wykluczeniem siebie !!!
+        # TODO: random osoba z wykluczeniem siebie !!!
         rodzic1, rodzic2 = rodzice[i * 2], rodzice[i * 2 + 1]
-        if random.uniform(0,1)>=wspolczynnikKrzyzowania:
+        if random.uniform(0,1)<=wspolczynnikKrzyzowania:
             dziecko1, dziecko2 = krzyzowanie(rodzic1, rodzic2)
-
         else:
             dziecko1 = rodzic1
             dziecko2 = rodzic2
@@ -70,23 +78,20 @@ for generacja in range(generacjeIlosc):
     # zastąpienie populacji nową generacją
     populacja = nowaPopulacja
 
-# wybór najlepszego osobnika
-najlepszy_osobnik = max(populacja, key=OcenaDopasowan)
-najlepszeDopasowanie = OcenaDopasowan(najlepszy_osobnik)
-
-
-
+    # wybór najlepszego osobnika
+    najlepszy_osobnik = max(populacja, key=OcenaDopasowan)
+    najlepszeDopasowanie = OcenaDopasowan(najlepszy_osobnik)
 # Wyniki
-print("Najlepszy Osobnik:", najlepszy_osobnik)
-print("Najlepsze Dopasowanie:", najlepszeDopasowanie)
-najlepszaWaga=0
-print(najlepszy_osobnik)
-print(wagaPrzedmiotu)
-for x in range(10):
-    if najlepszy_osobnik[x]==1:
-        najlepszaWaga= najlepszaWaga + wagaPrzedmiotu[x]
+    print("Najlepszy Osobnik:", najlepszy_osobnik)
+    print("Najlepsze Dopasowanie Wartości:", najlepszeDopasowanie)
+    najlepszaWaga = 0
+# print(najlepszy_osobnik)
+# print(wagaPrzedmiotu)
+    for x in range(len(wagaPrzedmiotu)):
+        if najlepszy_osobnik[x]==1:
+            najlepszaWaga= najlepszaWaga + wagaPrzedmiotu[x]
 
-for x in range(rozmiarPopulacji):
-    print(populacja[x])
-print ("Waga :", najlepszaWaga)
+    print ("Przy Wadze:", najlepszaWaga)
 
+    # fig = px.scatter(x=[], y=[])
+    # fig.show()
