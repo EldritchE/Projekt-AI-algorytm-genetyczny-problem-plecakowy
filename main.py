@@ -11,9 +11,9 @@ wartoscPrzedmiotu = [25, 32, 5, 8, 16, 12, 19, 2, 14, 3]
 pojemnoscPlecaka = 89
 
 # parametry_algorytmu
-rozmiarPopulacji = 20
-wspolczynnikMutacji = 0.1
-generacjeIlosc = 4
+rozmiarPopulacji = 40
+wspolczynnikMutacji = 0.01
+generacjeIlosc = 20
 wspolczynnikKrzyzowania=0.8
 
 
@@ -35,11 +35,14 @@ def Ruletka(population, wynikDopasowania):
     start = 0.0
     suma = sum(wynikDopasowania)
     los = random.random()
+    nowyStart=0.0
     for x in range(len(wynikDopasowania)):
-        nowyStart = wynikDopasowania[x] / suma
+        nowyStart += wynikDopasowania[x] / suma
         if (start <= los < nowyStart):
             return population[x]
         start = nowyStart
+    print("Awaria poza zakresem")
+    return population[1]
 
 
 def krzyzowanie(rodzic1, rodzic2):
@@ -56,13 +59,14 @@ def mutate(jednostka, szansa=0.1):
 
 
 y=[]
+wszystkieSredniePopulacji=[]
 for generacja in range(generacjeIlosc):
 
 
     wynikDopasowania = [OcenaDopasowan(jednostka) for jednostka in populacja]
     print("Wyniki dopasowania całej polpulacji ",wynikDopasowania)
 
-    # rodzice = [Ruletka(populacja,wynikDopasowania) for _ in range(rozmiarPopulacji)]
+
     
 
     kary=0
@@ -109,8 +113,12 @@ for generacja in range(generacjeIlosc):
     najlepszeDopasowanie = OcenaDopasowan(najlepszy_osobnik)
     y.append(najlepszeDopasowanie)
 # Wyniki
+    sredniaPopulacji=sum(wynikDopasowania)/rozmiarPopulacji
+    wszystkieSredniePopulacji.append(sredniaPopulacji)
+    print("Średnia wartości dopasowań populacji ",sredniaPopulacji)
     print("Najlepszy Osobnik:", najlepszy_osobnik)
     print("Najlepsze Dopasowanie Wartości:", najlepszeDopasowanie)
+
 
     najlepszaWaga = 0
 # print(najlepszy_osobnik)
@@ -123,7 +131,10 @@ for generacja in range(generacjeIlosc):
     print("Ilość osobników w populacji ukaranych za przeładowanie: )", kary, "\n")
     print("*"*70)
 
-    plt.plot(generacja+1,najlepszeDopasowanie,'ro')
+    plt.plot(generacja + 1, najlepszeDopasowanie, 'ro')
+    plt.plot(generacja + 1, sredniaPopulacji, 'bo')
+    plt.legend(['Najlepszy osobnik', 'Srednia populacji'])
+
     plt.ylabel("Najlepsze dopadsowanie wartości")
     plt.xlabel("Kolejna generacja")
     x = range(1,generacjeIlosc+1)
@@ -142,5 +153,19 @@ mymodel = list(map(myfunc, x))
 
 plt.scatter(x, y)
 plt.plot(x, mymodel)
+
+x = range(1, generacjeIlosc + 1)
+slope, intercept, r, p, std_err = stats.linregress(x,wszystkieSredniePopulacji)
+
+def myfunc(x):
+    return slope * x + intercept
+
+mymodel = list(map(myfunc, x))
+
+plt.scatter(x, wszystkieSredniePopulacji)
+plt.plot(x, mymodel)
+
+
+
 
 plt.show()
