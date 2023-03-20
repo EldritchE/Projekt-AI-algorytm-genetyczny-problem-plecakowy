@@ -16,7 +16,7 @@ wspolczynnikMutacji = 0.1
 generacjeIlosc = 4
 wspolczynnikKrzyzowania=0.8
 
-# initialize population
+
 def Generowanie_Indywidualne():
     return [random.randint(0, 1) for _ in range(len(wagaPrzedmiotu))]
 
@@ -30,33 +30,39 @@ def OcenaDopasowan(jednostka):
     # print("+")
     return wartoscCalkowita if wagaCalkowita <= pojemnoscPlecaka else 0
 
-# select parents for crossover
-def Ruletka(population, k=3):
 
-    konkurs = random.sample(population, k)
-    return max(konkurs, key=OcenaDopasowan)
+def Ruletka(population, wynikDopasowania):
+    start = 0.0
+    suma = sum(wynikDopasowania)
+    los = random.random()
+    for x in range(len(wynikDopasowania)):
+        nowyStart = wynikDopasowania[x] / suma
+        if (start <= los < nowyStart):
+            return population[x]
+        start = nowyStart
 
-# perform crossover between parents
+
 def krzyzowanie(rodzic1, rodzic2):
     punktKrzyzowania = random.randint(1, len(rodzic1) - 1)
     dziecko1 = rodzic1[:punktKrzyzowania] + rodzic2[punktKrzyzowania:]
     dziecko2 = rodzic2[:punktKrzyzowania] + rodzic1[punktKrzyzowania:]
     return dziecko1, dziecko2
 
-# perform mutation on individual
+
 def mutate(jednostka, szansa=0.1):
     for i in range(len(jednostka)):
         if random.random() < szansa:
             jednostka[i] = 1 - jednostka[i]
 
-# main genetic algorithm loop
+
 y=[]
 for generacja in range(generacjeIlosc):
-    # evaluate fitness of current population
+
+
     wynikDopasowania = [OcenaDopasowan(jednostka) for jednostka in populacja]
     print("Wyniki dopasowania całej polpulacji ",wynikDopasowania)
-    # select parents for crossover
-    rodzice = [Ruletka(populacja) for _ in range(rozmiarPopulacji)]
+
+    # rodzice = [Ruletka(populacja,wynikDopasowania) for _ in range(rozmiarPopulacji)]
     
 
     kary=0
@@ -75,13 +81,13 @@ for generacja in range(generacjeIlosc):
             print("")
     print("\n")
     
-    # perform crossover and mutation to create new generation
+
     nowaPopulacja = []
     odrzucone=0
     for i in range(rozmiarPopulacji // 2):
-        rodzic1, rodzic2 = Ruletka(populacja), Ruletka(populacja)
+        rodzic1, rodzic2 = Ruletka(populacja,wynikDopasowania), Ruletka(populacja,wynikDopasowania)
         while rodzic2 == rodzic1:
-            rodzic2 = Ruletka(populacja)
+            rodzic2 = Ruletka(populacja,wynikDopasowania)
         if random.uniform(0, 1) <= wspolczynnikKrzyzowania:
             dziecko1, dziecko2 = krzyzowanie(rodzic1, rodzic2)
         # Przechodzą dalej czy mamy losować nową parę na ich miejsce???
