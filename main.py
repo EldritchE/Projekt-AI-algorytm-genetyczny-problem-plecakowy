@@ -12,7 +12,7 @@ pojemnoscPlecaka = 89
 # parametry_algorytmu
 rozmiarPopulacji = 20
 wspolczynnikMutacji = 0.1
-generacjeIlosc = 4
+generacjeIlosc = 2
 wspolczynnikKrzyzowania=0.8
 
 # initialize population
@@ -23,8 +23,10 @@ populacja = [Generowanie_Indywidualne() for _ in range(rozmiarPopulacji)]
 
 # oceniać kondycję poszczególnych dopasowan
 def OcenaDopasowan(jednostka):
+    liczbakrzyzowek=0
     wagaCalkowita = sum([jednostka[i] * wagaPrzedmiotu[i] for i in range(len(wagaPrzedmiotu))])
     wartoscCalkowita = sum([jednostka[i] * wartoscPrzedmiotu[i] for i in range(len(wartoscPrzedmiotu))])
+    # print("+")
     return wartoscCalkowita if wagaCalkowita <= pojemnoscPlecaka else 0
 
 # select parents for crossover
@@ -50,6 +52,7 @@ y=[]
 for generacja in range(generacjeIlosc):
     # evaluate fitness of current population
     wynikDopasowania = [OcenaDopasowan(jednostka) for jednostka in populacja]
+    print("Wyniki dopasowania całej polpulacji ",wynikDopasowania)
     # select parents for crossover
     rodzice = [Ruletka(populacja) for _ in range(rozmiarPopulacji)]
     
@@ -57,9 +60,15 @@ for generacja in range(generacjeIlosc):
     
     for x in range(len(populacja)):
         if(x < 9):
-            print("osobnik #",x+1,"  ",populacja[x])
+            print("osobnik #",x+1,"  ",populacja[x],"Wynik dopasowania tego osobnika : ",wynikDopasowania[x],end="")
+            if wynikDopasowania[x]==0:
+                print(" Osobnik ",x+1,"jest przeładowany i ponosi karę",end="")
+            print("")
         else:
-            print("osobnik #",x+1," ",populacja[x])
+            print("osobnik #",x+1," ",populacja[x],"Wynik dopasowania tego osobnika : ",wynikDopasowania[x],end="")
+            if wynikDopasowania[x]==0:
+                print(" Osobnik ",x+1,"jest przeładowany i ponosi karę",end="")
+            print("")
     print("\n")
     
     # perform crossover and mutation to create new generation
